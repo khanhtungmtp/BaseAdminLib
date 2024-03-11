@@ -1,0 +1,10 @@
+<span class="text-truncate">{{ label ?? value?.toString() ?? '???' }}</span>
+@if (!disabled) {
+  <button (click)="handleRemove($event)"
+          [disabled]="((multiselectVisible()) ?? true) === false"
+          aria-label="Clear"
+          class="form-multi-select-tag-delete close"
+          type="button">
+    <span aria-hidden="true">×</span>
+  </button>
+}

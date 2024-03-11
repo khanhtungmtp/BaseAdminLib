@@ -1,0 +1,9 @@
+<div (click)="handleElementClick($event, element)"
+     *ngFor="let element of elements; index as i; trackBy: trackByElement"
+     [attr.disabled]="element.disabled || null"
+     [cDayPeriodElement]="element"
+     [ngClass]="{'time-picker-roll-cell': true, selected: element.value === selected, disabled: element.disabled}"
+     [ngStyle]="{'width': 'fit-content'}"
+     role="button">
+  {{element.label}}
+</div>

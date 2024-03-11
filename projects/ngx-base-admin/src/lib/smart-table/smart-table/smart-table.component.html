@@ -1,0 +1,224 @@
+<div *ngIf="itemsPerPageSelect || tableFilter || cleaner || templates['tableCustomHeader']" class="row my-2 mx-0">
+  <div class="col-auto p-0" *ngIf="tableFilter">
+    <ng-container *ngTemplateOutlet="tableFilterTemplate" />
+  </div>
+  <div class="col-auto p-0" *ngIf="cleaner">
+    <ng-container *ngTemplateOutlet="tableCleanerTemplate" />
+  </div>
+  <ng-container *ngTemplateOutlet="templates['tableCustomHeader'] || tableCustomHeaderTemplate" />
+
+  <ng-template #tableFilterTemplate>
+    <c-smart-table-filter
+      (valueChange)="handleTableFilterChange($event)"
+      *ngIf="tableFilter"
+      [delay]="300"
+      [filterLabel]="tableFilterLabel"
+      [filterPlaceholder]="tableFilterPlaceholder"
+      [onEvent]="tableFilterEvent"
+      [value]="tableFilterState"
+      cFilterInput
+    >
+    </c-smart-table-filter>
+  </ng-template>
+
+  <ng-template #tableCleanerTemplate>
+    <button
+      (click)="clean($event)"
+      *ngIf="cleaner"
+      [disabled]="!isFiltered"
+      [ngClass]="{'ms-1': tableFilter}"
+      [tabindex]="0"
+      cButton
+      variant="ghost"
+      color="transparent"
+    >
+      <ng-container *ngTemplateOutlet="filterIconTemplate" />
+    </button>
+  </ng-template>
+
+  <ng-template #tableCustomHeaderTemplate>
+    <div class="col-auto p-0 ms-auto">
+      <ng-content select="[customHeader]" />
+    </div>
+  </ng-template>
+</div>
+<div class="position-relative">
+  <table [align]="tableProps?.align"
+         [borderColor]="tableProps?.borderColor"
+         [bordered]="tableProps?.bordered ?? undefined"
+         [borderless]="tableProps?.borderless ?? undefined"
+         [caption]="tableProps?.caption"
+         [color]="tableProps?.color"
+         [hover]="tableProps?.hover ?? undefined"
+         [responsive]="tableProps?.responsive"
+         [small]="tableProps?.small ?? undefined"
+         [striped]="tableProps?.striped ?? undefined"
+         [cHtmlAttr]="tableProps?.attributes ?? {}"
+         [cTableColor]="tableProps?.color"
+         cTable
+  >
+    <c-smart-table-head
+      (columnFilterStateChange)="handleColumnFilterChange($event)"
+      (selectAllChange)="handleSelectAllChange($event)"
+      (sorterStateChange)="handleSortChange($event)"
+      *ngIf="header"
+      [columnFilterState]="columnFilterState"
+      [columnFilter]="columnFilter"
+      [columns]="columns"
+      [selectAll]="selectAll"
+      [selectedAll]="(selectedAllSubject | async) ?? false"
+      [selectable]="selectable"
+      [columnSorter]="columnSorter"
+      [sorterValue]="sorterValue"
+      [cHtmlAttr]="tableHeadProps?.attributes ?? {}"
+      [cTableColor]="tableHeadProps?.color"
+      [cAlign]="tableHeadProps?.align"
+      [columnFilterTemplates]="columnFilterTemplates"
+      [columnLabelTemplates]="columnLabelTemplates"
+    />
+
+    <ng-container *ngTemplateOutlet="tbodyDefaultTemplate" />
+
+    <tfoot *ngIf="summaryRowTemplate && !footer">
+      <ng-container *ngTemplateOutlet="summaryRowTemplate" />
+    </tfoot>
+
+    <c-smart-table-head
+      (selectAllChange)="handleSelectAllChange($event)"
+      (sorterStateChange)="handleSortChange($event)"
+      *ngIf="footer"
+      [columns]="columns"
+      [selectAll]="selectAll"
+      [selectedAll]="(selectedAllSubject | async) ?? false"
+      [selectable]="selectable"
+      [columnSorter]="columnSorter"
+      [sorterValue]="sorterValue"
+      [cHtmlAttr]="tableFootProps?.attributes ?? {}"
+      [cTableColor]="tableFootProps?.color"
+      [cAlign]="tableFootProps?.align"
+      component="tfoot"
+      [columnFilterTemplates]="columnFilterTemplates"
+      [columnLabelTemplates]="columnLabelTemplates"
+      [summaryRowTemplate]="summaryRowTemplate"
+    />
+
+  </table>
+  <c-element-cover
+    *ngIf="loading"
+    [boundaries]="[
+      { sides: ['top'], query: 'td' },
+      { sides: ['bottom'], query: 'tbody' }
+    ]"
+  ></c-element-cover>
+</div>
+<ng-template [ngIf]="pagination || itemsPerPageSelect">
+  <div class="row">
+    <div class="col">
+      <c-smart-pagination
+        (activePageChange)="setActivePage($event)"
+        *ngIf="pagination && numberOfPages > 1"
+        [activePage]="activePage"
+        [pages]="numberOfPages"
+      />
+    </div>
+    <div class="col-auto ms-auto">
+      <c-smart-table-items-per-page-selector
+        (itemsPerPageChange)="handleItemsPerPageChange($event)"
+        *ngIf="itemsPerPageSelect"
+        [itemsPerPageLabel]="itemsPerPageLabel"
+        [itemsPerPageOptions]="itemsPerPageOptions"
+        [itemsPerPage]="itemsPerPage"
+      />
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #tbodyDefaultTemplate>
+  <tbody [cHtmlAttr]="tableBodyProps?.attributes ?? {}"
+         [cTableColor]="tableBodyProps?.color"
+         [cAlign]="tableBodyProps?.align"
+  >
+  <ng-template ngFor let-item [ngForOf]="currentItems" let-cnt="count" let-i="index" let-isEven="even" let-isOdd="odd">
+    <tr [tabindex]="clickableRows ? 0 : -1"
+        [ngStyle]="{cursor: clickableRows ? 'pointer' : 'auto'}"
+        (click)="handleRowClick({$event, item, i})"
+        [cTableActive]="item._props?.active ?? undefined"
+        [cTableColor]="item._props?.color"
+        [cAlign]="item._props?.align"
+    >
+      <td *ngIf="selectable"
+          [cTableActive]="item?.['_cellProps']?._all?.active ?? undefined"
+          [cTableColor]="item?.['_cellProps']?._all?.color"
+          [cAlign]="item?.['_cellProps']?._all?.align"
+      >
+        <input (change)="handleRowChecked($event, item)"
+               [checked]="item._selected ?? false"
+               cFormCheckInput
+               [disabled]="(item?._selectable === false) ?? false"
+               autocomplete="off"
+        >
+      </td>
+      <ng-template ngFor let-columnName [ngForOf]="rawColumnNames" let-i="index">
+        <ng-container
+          *ngTemplateOutlet="templates['tableData'] || columnDefaultTemplate; context: {item, columnName, tdContent: item[columnName] }" />
+      </ng-template>
+    </tr>
+    <ng-template [ngIf]="templates['tableDetails']">
+      <!--      <ng-container *ngTemplateOutlet="rowDetailsDefaultTemplate"></ng-container>-->
+      <tr>
+        <td [colSpan]="colspan" class="p-0" tabindex="-1" [ngStyle]="{borderBottomWidth: 0}"></td>
+      </tr>
+      <tr class="p-0">
+        <td [colSpan]="colspan" class="p-0" [ngStyle]="{border: 0}">
+          <ng-container *ngTemplateOutlet="templates['tableDetails']; context: {item, index: i}" />
+        </td>
+      </tr>
+    </ng-template>
+  </ng-template>
+  <ng-container *ngTemplateOutlet="noItemsDefaultTemplate" />
+  </tbody>
+</ng-template>
+
+<ng-template #columnDefaultTemplate let-item="item" let-columnName="columnName" let-tdContent="tdContent">
+  <td
+    [cTableActive]="tableDataCellProps(item, columnName)?.['active']"
+    [cTableColor]="tableDataCellProps(item, columnName)?.color"
+    [cAlign]="tableDataCellProps(item, columnName)?.align"
+    [ngClass]="tableDataCellClasses(item, columnName)"
+    [cHtmlAttr]="tableDataCellProps(item, columnName)?.['_attributes'] ?? undefined"
+  >
+    {{tdContent}}
+  </td>
+</ng-template>
+
+<!--<ng-template #rowDetailsDefaultTemplate let-item let-index>-->
+<!--  <tr><td [colSpan]="colspan" class="p-0" tabindex="-1" [ngStyle]="{borderBottomWidth: 0}"></td></tr>-->
+<!--  <tr class="p-0">-->
+<!--    <td [colSpan]="colspan" class="p-0" [ngStyle]="{border: 0}">-->
+<!--      <ng-container *ngTemplateOutlet="templates?.tableDetails"></ng-container>-->
+<!--    </td>-->
+<!--  </tr>-->
+<!--</ng-template>-->
+
+<ng-template #noItemsDefaultTemplate>
+  <tr *ngIf="!currentItems.length">
+    <td [colSpan]="colspan" class="justify-content-center">{{noItemsLabel}}</td>
+  </tr>
+</ng-template>
+
+<!--todo: filterIconCustomTemplate-->
+<ng-template #filterIconTemplate>
+  <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" pointer-events="none" role="img"
+       class="icon icon-custom-size" width="18">
+    <polygon
+      fill="var(--ci-primary-color, currentColor)"
+      points="40 16 40 53.828 109.024 136 150.815 136 76.896 48 459.51 48 304 242.388 304 401.373 241.373 464 240 464 240 368 208 368 208 496 254.627 496 336 414.627 336 253.612 496 53.612 496 16 40 16"
+      class="ci-primary">
+    </polygon>
+    <polygon
+      fill="var(--ci-primary-color, currentColor)"
+      points="166.403 248.225 226.864 187.763 204.237 165.135 143.775 225.597 83.313 165.135 60.687 187.763 121.148 248.225 60.687 308.687 83.313 331.314 143.775 270.852 204.237 331.314 226.864 308.687 166.403 248.225"
+      class="ci-primary">
+    </polygon>
+  </svg>
+</ng-template>

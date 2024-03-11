@@ -1,0 +1,141 @@
+<c-dropdown #dropdown="cDropdown"
+            [(visible)]="visible"
+            [autoClose]="'outside'"
+            [ngClass]="multiselectClasses"
+            [popperOptions]="popperjsOptions"
+            class="picker"
+>
+  <div #dropdownToggle="cDropdownToggle" [caret]="false" [disabled]="disabled" cDropdownToggle role="button">
+    <span class="form-multi-select-selection">
+      @if (selectionType === 'tags') {
+        @if (optionsSelected$ | async;as optionTags) {
+          @for (option of optionTags;track option.value;let i = $index) {
+            <c-multi-select-tag
+              (remove)="handleTagRemove($event)"
+              [disabled]="option.disabled ?? false"
+              [label]="option.label ?? option.value?.toString()"
+              [option]="option"
+              [value]="option.value"
+              class="form-multi-select-tag text-truncate"
+              tabindex="-1"
+            />
+          }
+        }
+      } @else if (selectionType === 'text' && !!selectedOptions.length) {
+        @for (option of selectedOptions;track option.value;let i = $index, last = $last) {
+          <span class="form-multi-select-text text-truncate">{{ option.label }}{{ last ? '&nbsp;' : ',&nbsp;' }}</span>
+        }
+      }
+      @if (!search) {
+        <span class="text-placeholder text-truncate">
+          {{ optionsSelected.size === 0 ? placeholder : counterPlaceholderText }}
+        </span>
+      }
+      @if (search) {
+        <input
+          #inputElement
+          (keydown)="handleSearchKeyDown($event)"
+          (valueChange)="handleSearchValueChange($event)"
+          [attr.placeholder]="selectedOptions.length === 0 ? placeholder : counterPlaceholderText"
+          [disabled]="disabled || !search"
+          [ngClass]="{ 'form-multi-select-search': true, disabled: (disabled || !search), 'text-truncate': true, 'ms-1': selectionType === 'tags' && selectedOptions.length > 0 }"
+          [ngModel]="searchValue"
+          [value]="searchValue"
+          autocomplete="off"
+          cMultiSelectSearch
+          size="2"
+          tabindex="{{ disabled ? -1 : 0 }}"
+          type="text"
+        >
+      }
+      @if (!!cleaner && optionsSelected.size > 0 && !disabled) {
+        <button
+          (click)="clearAllOptions($event)"
+          [disabled]="disabled || (!isDropdownVisible && cleaner !== 'active')"
+          aria-label="Clear all"
+          class="form-multi-select-selection-cleaner d-flex"
+          type="button"
+        ></button>
+      }
+    </span>
+  </div>
+  @if (!disabled) {
+    <div #dropdownMenu="cDropdownMenu" [visible]="dropdown.visible" cDropdownMenu role="menu">
+      @if (visibleOptions() && options.length > 0) {
+        @if (selectAll && multiple && !virtualScroller) {
+          <button
+            (click)="selectAllOptions()"
+            class="form-multi-select-all"
+            type="button"
+            tabindex="0"
+          >
+            {{ selectAllLabel }}
+          </button>
+        }
+      }
+      @if ((visibleOptions() && options.length > 0) || isLoading()) {
+        <ng-container *ngTemplateOutlet="virtualScroller ? multiselectVirtualScroller : multiselectOptionsDiv" />
+      } @else {
+        <div class="form-multi-select-options-empty">{{ searchNoResultsLabel }}</div>
+      }
+      @if (isLoading()) {
+        <c-element-cover [ngStyle]="{'border-radius': '6px', 'z-index': 2}" />
+      }
+    </div>
+  }
+</c-dropdown>
+
+<ng-template #multiselectVirtualScroller>
+  @defer {
+    @if ((optionsArray$ | async);as optionsArray) {
+      <cdk-virtual-scroll-viewport
+        #scrollViewport
+        (scrolledIndexChange)="handleScrolledIndexChange($event, scrollViewport)"
+        [itemSize]="itemSize"
+        [ngStyle]="optionsMaxHeight !== 'auto' ? { 'height.px': optionsMaxHeight, 'maxHeight.px': optionsMaxHeight, 'minWidth.px': itemMinWidth ?? 196, overflowX: 'hidden' } : { 'minWidth.px': itemMinWidth ?? 196, overflowX: 'hidden'}"
+        maxBufferPx="{{itemSize * visibleItems}}"
+        minBufferPx="{{itemSize * visibleItems}}"
+        class="form-multi-select-options"
+        tabindex="-1"
+      >
+        <ng-container
+          #cdkVirtualFor
+          *cdkVirtualFor="let option of optionsArray; trackBy: trackByFn; templateCacheSize: 0; even as even; odd as odd; index as index; count as count; first as first; last as last;"
+          [ngTemplateOutletContext]="{$implicit: option, even, odd, index, count, first, last}"
+          [ngTemplateOutlet]="templates['multiSelectOptionTemplate'] || defaultMultiSelectOptionTemplate"
+        />
+      </cdk-virtual-scroll-viewport>
+    }
+  }
+</ng-template>
+
+<ng-template #multiselectOptionsDiv>
+  <div
+    [ngClass]="{'form-multi-select-options': visibleOptions()}"
+    [ngStyle]="optionsMaxHeight !== 'auto' ? { 'maxHeight.px': optionsMaxHeight, overflowY: 'scroll' } : {}"
+  >
+    <ng-content />
+    <ng-container [ngTemplateOutlet]="userOptionsTemplate" />
+  </div>
+</ng-template>
+
+<ng-template #defaultMultiSelectOptionTemplate let-option>
+  <c-multi-select-option
+    [disabled]="option.disabled"
+    [label]="option.label"
+    [text]="option.text"
+    [value]="option.value"
+    [visible]="option.visible"
+  >
+    {{ option.text }}
+  </c-multi-select-option>
+</ng-template>
+
+<ng-template #userOptionsTemplate>
+  @for (option of userOptionsArray$ | async;track option;let even = $even, odd = $odd, index = $index, count = $count, first = $first, last = $last) {
+    <ng-container
+      [ngTemplateOutlet]="templates['multiSelectOptionTemplate'] || defaultMultiSelectOptionTemplate"
+      [ngTemplateOutletContext]="{$implicit: option, even, odd, index, count, first, last}"
+    />
+  }
+</ng-template>

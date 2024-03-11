@@ -1,0 +1,13 @@
+:host {
+  &.thead {
+    display: table-header-group;
+    vertical-align: middle;
+    border-color: inherit;
+  }
+  &.tfoot {
+    display: table-footer-group;
+    vertical-align: middle;
+    border-color: inherit;
+  }
+  user-select: none;
+}

@@ -1,0 +1,6 @@
+:host {
+  display: block;
+  .disabled {
+    pointer-events: none;
+  }
+}

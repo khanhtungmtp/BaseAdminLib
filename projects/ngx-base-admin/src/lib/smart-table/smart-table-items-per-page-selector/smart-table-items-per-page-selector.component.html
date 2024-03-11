@@ -1,0 +1,6 @@
+<label cLabel="col" class="col-sm-auto">{{itemsPerPageLabel}}</label>
+<div class="col-auto">
+  <select [(ngModel)]="itemsPerPage" cSelect name="itemsPerPageSelector">
+    <option *ngFor="let option of itemsPerPageOptions; let i = index" [ngValue]="option">{{option}}</option>
+  </select>
+</div>

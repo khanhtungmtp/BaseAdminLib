@@ -1,0 +1,11 @@
+<select [disabled]="disabled" [id]="id" [multiple]="multiple" [name]="name" style="display: none" tabindex="-1">
+  <option
+    *ngFor="let option of options"
+    [attr.selected]="option.selected ? '' : null"
+    [disabled]="disabled"
+    [label]="option.label"
+    [value]="option.value"
+    tabindex="-1"
+  ></option>
+</select>
+

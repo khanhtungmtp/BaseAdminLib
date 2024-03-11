@@ -1,0 +1,15 @@
+:host {
+  .btn-xs {
+    padding-left: 0.125rem;
+    padding-right: 0.125rem;
+    font-size: 0.575rem;
+    border-radius: 0.2rem;
+  }
+
+  &.form-multi-select-tag {
+    user-select: none;
+    pointer-events: all;
+    align-items: center;
+    display: flex;
+  }
+}

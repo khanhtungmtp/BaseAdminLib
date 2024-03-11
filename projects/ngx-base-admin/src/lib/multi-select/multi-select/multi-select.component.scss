@@ -1,0 +1,78 @@
+//@forward '@coreui/coreui-pro/scss/coreui';
+
+:host {
+
+  display: block;
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &.cdk-focused:not(.disabled) {
+    .form-multi-select {
+      color: var(--cui-form-multi-select-focus-color, rgba(44, 56, 74, 0.95));
+      background-color: var(--cui-form-multi-select-focus-bg, #fff);
+      border-color: var(--cui-form-multi-select-focus-border-color, #6557e4);
+      box-shadow: 0 0 0 0.25rem rgba(50, 31, 219, 0.25);
+    }
+  }
+
+  &:not(.cdk-focused) {
+    .form-multi-select:not(.show) {
+      input.form-multi-select-search:not([placeholder]) {
+        width: 0.1rem;
+        margin-inline-start: 0;
+        display: none;
+      }
+    }
+  }
+
+  .form-multi-select {
+
+    .form-multi-select-selection {
+      display: flex;
+      flex: 1 1 auto;
+      flex-wrap: wrap;
+
+      .form-multi-select-search {
+        margin-left: 0;
+        margin-right: 0;
+        display: flex;
+        flex: 1 1 auto;
+      }
+
+      .text-placeholder, .form-multi-select-search::placeholder {
+        color: var(--cui-form-multi-select-color);
+        opacity: .8;
+      }
+
+    }
+
+    .form-multi-select-search[size] {
+      display: flex;
+    }
+
+  }
+
+  ::ng-deep {
+    .cdk-virtual-scroll-content-wrapper {
+      //todo: @extend .form-multi-select-options;
+      padding: var(--cui-form-multi-select-options-padding-y) var(--cui-form-multi-select-options-padding-x);
+      font-size: 1rem;
+      color: var(--cui-form-multi-select-options-color);
+    }
+  }
+
+  // todo: width
+  .cdk-virtual-scroll-viewport {
+    width: var(--cui-dropdown-min-width);
+  }
+
+  .dropdown-menu {
+    --cui-dropdown-padding-y: 0;
+  }
+
+}
+
+
+

@@ -1,0 +1,109 @@
+<c-dropdown #dropdown="cDropdown" [autoClose]="'outside'" class="date-picker picker" [ngClass]="datePickerClasses"
+            [(visible)]="visible" [popperOptions]="popperjsOptions">
+  <c-input-group [caret]="false"
+                 [disabled]="disabled ?? dropdown.visible"
+                 [sizing]="size ?? ''"
+                 cDropdownToggle
+                 class="picker-input-group"
+  >
+    <input (change)="handleStartDateInputChange($event)"
+           [formControl]="startDateInput"
+           [ngClass]="{hover: !!inputStartHoverValue}"
+           [placeholder]="startDatePlaceholder"
+           cFormControl
+           #startDateElementRef
+           [attr.tabindex]="disabled ? -1 : 0"
+           pattern="[1-9]*"
+           [readonly]="inputReadOnly ?? null"
+           [valid]="range ? undefined : valid"
+    >
+    <span *ngIf="range && separator !== false" cInputGroupText>
+        <span class="picker-input-group-icon date-picker-arrow-icon"></span>
+      </span>
+    <input (change)="handleEndDateInputChange($event)"
+           *ngIf="range"
+           [formControl]="endDateInput"
+           [ngClass]="{hover: !!inputEndHoverValue}"
+           [placeholder]="endDatePlaceholder"
+           cFormControl
+           #endDateElementRef
+           [attr.tabindex]="disabled ? -1 : 0"
+           pattern="[1-9]*"
+           [readonly]="inputReadOnly ?? null"
+           [valid]="valid ?? undefined"
+    >
+    <span *ngIf="indicator || cleaner" cInputGroupText>
+      <span *ngIf="indicator" class="picker-input-group-indicator">
+        <span class="picker-input-group-icon date-picker-input-icon"></span>
+      </span>
+      <span (click)="!disabled && handleClear($event)"
+            *ngIf="cleaner && startDateElementRef.value && !disabled"
+            class="picker-input-group-cleaner" role="button">
+        <span class="picker-input-group-icon date-picker-cleaner-icon"></span>
+      </span>
+    </span>
+
+  </c-input-group>
+  <div cDropdownMenu>
+    <div class="date-picker-body">
+      <ng-template [ngIf]="!showRanges">
+        <div *ngIf="ranges && customRanges.length > 0" class="date-picker-ranges">
+          <button (click)="setCustomRange(customRange)"
+                  *ngFor="let customRange of customRanges"
+                  [color]="rangesButtonsColor"
+                  [size]="rangesButtonsSize"
+                  [variant]="rangesButtonsVariant"
+                  cButton>
+            {{customRange | customRangeKey}}
+          </button>
+        </div>
+      </ng-template>
+      <c-calendar
+        (calendarCellHover)="handleCalendarCellHover($event)"
+        (calendarDateChange)="handleCalendarDateChange($event)"
+        (endDateChange)="handleEndDateChange($event)"
+        (startDateChange)="handleStartDateChange($event)"
+        [calendarDate]="calendarDate"
+        [calendars]="isMobile ? 1 : calendars"
+        [dateFilter]="dateFilter"
+        [disabledDates]="disabledDates"
+        [endDate]="endDate"
+        [firstDayOfWeek]="firstDayOfWeek"
+        [locale]="locale"
+        [maxDate]="maxDate"
+        [minDate]="minDate"
+        [navigation]="navigation"
+        [range]="range"
+        [startDate]="startDate"
+        [navYearFirst]="navYearFirst"
+        [dayFormat]="dayFormat"
+        [weekdayFormat]="weekdayFormat"
+        [selectAdjacentDays]="selectAdjacentDays"
+        [showAdjacentDays]="showAdjacentDays"
+        class="date-picker-calendars"
+      ></c-calendar>
+      <div *ngIf="false && timepicker" class="date-picker-timepickers">
+        <!-- todo-->
+        <c-time-picker
+          variant="select"
+          [locale]="locale"
+          [disabled]="!startDate"
+          [time]="startDate ?? undefined"
+          (timeChange)="handleStartTimeChange($event)"
+        ></c-time-picker>
+        <c-time-picker
+          *ngIf="range"
+          variant="select"
+          [locale]="locale"
+          [disabled]="!endDate"
+          [time]="endDate ?? undefined"
+          (timeChange)="handleEndTimeChange($event)"
+        ></c-time-picker>
+      </div>
+    </div>
+    <div *ngIf="templates?.datePickerFooter" class="picker-footer">
+      <ng-container *ngTemplateOutlet="templates?.datePickerFooter; context: {$implicit: dropdown}"></ng-container>
+    </div>
+  </div>
+  <ng-content></ng-content>
+</c-dropdown>

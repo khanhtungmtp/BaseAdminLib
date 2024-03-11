@@ -1,0 +1,15 @@
+<ng-container *ngFor="let calendar of calendarsArray; let i=index;">
+  <div [ngClass]="view | calendarClassView">
+    <c-calendar-navigation
+      [addMonths]="i"
+      [navigation]="navigation"
+      (navigationClick)="handleNavigationClick($event.direction, $event.years)"
+    ></c-calendar-navigation>
+
+    <c-calendar-month
+      [addMonths]="i"
+      [firstDayOfWeek]="firstDayOfWeek"
+      [weekdayFormat]="weekdayFormat"
+    ></c-calendar-month>
+  </div>
+</ng-container>

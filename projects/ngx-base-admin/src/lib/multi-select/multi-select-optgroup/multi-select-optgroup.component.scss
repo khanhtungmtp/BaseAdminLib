@@ -1,0 +1,9 @@
+:host {
+  display: block;
+}
+
+:host-context(.dark-theme) {
+  .form-multi-select-optgroup-label {
+    color: var(--cui-form-multi-select-disabled-color);
+  }
+}

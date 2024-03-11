@@ -1,0 +1,57 @@
+<div *ngIf="navigation" class="calendar-nav-prev">
+  <button
+    (click)="handleNavigationClick('prev', true)"
+    cButton
+    color="transparent"
+    size="sm"
+    tabindex="0"
+  >
+    <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
+  </button>
+  <button
+    (click)="handleNavigationClick('prev')"
+    *ngIf="view === 'days'"
+    cButton
+    color="transparent"
+    size="sm"
+    tabindex="0"
+  >
+    <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
+  </button>
+</div>
+<div class="calendar-nav-date" [ngStyle]="navYearFirst ? { display: 'flex', justifyContent: 'center' } : {}">
+  <button
+    (click)="setView('months')"
+    *ngIf="view === 'days'"
+    cButton
+    color="transparent"
+    size="sm"
+    tabindex="0"
+  >
+    {{ date.toLocaleDateString(locale, { month: 'long' }) }}
+  </button>
+  <button (click)="setView('years')" cButton color="transparent" size="sm" tabindex="0" [ngStyle]="navYearFirst ? { order: '-1' } : {}">
+    {{ date.toLocaleDateString(locale, { year: 'numeric' }) }}
+  </button>
+</div>
+<div *ngIf="navigation" class="calendar-nav-next">
+  <button
+    (click)="handleNavigationClick('next')"
+    *ngIf="view === 'days'"
+    cButton
+    color="transparent"
+    size="sm"
+    tabindex="0"
+  >
+    <span class="calendar-nav-icon calendar-nav-icon-next"></span>
+  </button>
+  <button
+    (click)="handleNavigationClick('next', true)"
+    cButton
+    color="transparent"
+    size="sm"
+    tabindex="0"
+  >
+    <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
+  </button>
+</div>

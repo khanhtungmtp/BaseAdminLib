@@ -1,0 +1,129 @@
+<ng-template [ngIf]="component==='tfoot'">
+  <ng-container *ngTemplateOutlet="summaryRowTemplate" />
+</ng-template>
+<tr>
+  <th *ngIf="selectable">
+    <input
+      cFormCheckInput
+      (change)="handleSelectAllChecked($event)"
+      [checked]="selectedAll === true"
+      [indeterminate]="indeterminate$ | async"
+      type="checkbox"
+      [disabled]="!selectAll"
+      autocomplete="off"
+    >
+  </th>
+  <th
+    (click)="handleSortClick(column, i)"
+    *ngFor="let column of columns; let i = index"
+    [cHtmlAttr]="tableHeaderCellProps(column)"
+    [cTableColor]="tableHeaderCellColor(column)"
+    [ngStyle]="tableHeaderCellStyles(column)"
+  >
+    <ng-template [ngIf]="columnSorter && columnSorterEnabled(column)">
+      <ng-container
+        *ngTemplateOutlet="columnSorterIconTemplate; context: { $implicit: getColumnSorterState(column) }"
+      />
+    </ng-template>
+    <ng-container
+      *ngTemplateOutlet="columnLabelTemplates[getColumnLabel(column)] ?? defaultColumnLabel; context: {$implicit: column, header: this}"
+    />
+  </th>
+</tr>
+<tr *ngIf="columnFilter">
+  <th *ngIf="selectable"></th>
+  <th *ngFor="let column of columns; let i = index"
+      [cHtmlAttr]="tableHeaderCellProps(column)"
+      [cTableColor]="tableHeaderCellColor(column)"
+      [ngStyle]="tableHeaderCellStyles(column)"
+  >
+    <ng-container
+      *ngTemplateOutlet="columnFilterTemplates[getColumnFilter(column)] ?? defaultColumnFilter; context: {$implicit: column, header: this}"
+    />
+  </th>
+</tr>
+
+<ng-template #defaultColumnLabel let-column>
+  <div class="d-inline">{{ column | columnLabel }}</div>
+</ng-template>
+
+<ng-template #defaultColumnFilter let-column>
+  <c-smart-table-column-filter
+    (valueChange)="handleColumnFilterValueChange($event)"
+    *ngIf="columnFilterEnabled(column)"
+    [column]="column"
+    [delay]="300"
+    [onEvent]="columnFilterEvent"
+    [value]="columnFilterState[columnKey(column)] ?? ''"
+    cFilterInput
+    sizing="sm"
+  />
+</ng-template>
+
+<ng-template #columnSorterIconTemplate let-columnSorterState>
+  <ng-container [ngSwitch]="columnSorterState">
+    <span *ngSwitchCase="'asc'" class="float-end mx-1">
+      <ng-container *ngTemplateOutlet="sortingIconAscendingTemplate" />
+    </span>
+    <span *ngSwitchCase="'desc'" class="float-end mx-1">
+      <ng-container *ngTemplateOutlet="sortingIconDescendingTemplate" />
+    </span>
+    <span *ngSwitchDefault class="opacity-25 float-end mx-1">
+      <ng-container *ngTemplateOutlet="sortingIconTemplate" />
+    </span>
+  </ng-container>
+</ng-template>
+
+<!--todo: sortingIconCustom Templates-->
+<ng-template #sortingIconTemplate>
+  <svg
+    class="icon icon-custom-size"
+    role="img"
+    viewBox="0 0 512 512"
+    width="18"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <polygon
+      class="ci-primary"
+      fill="var(--ci-primary-color, currentColor)"
+      points="384 433.373 384 160 352 160 352 434.51 282.177 364.687 259.55 387.313 367.432 495.196 475.313 387.313 452.687 364.687 384 433.373"
+    ></polygon>
+    <polygon
+      class="ci-primary"
+      fill="var(--ci-primary-color, currentColor)"
+      points="159.432 17.372 51.55 125.255 74.177 147.882 144 78.059 144 352 176 352 176 79.195 244.687 147.882 267.313 125.255 159.432 17.372"
+    ></polygon>
+  </svg>
+</ng-template>
+
+<ng-template #sortingIconAscendingTemplate>
+  <svg
+    class="icon icon-custom-size"
+    role="img"
+    viewBox="0 0 512 512"
+    width="18"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <polygon
+      class="ci-primary"
+      fill="var(--ci-primary-color, currentColor)"
+      points="390.624 150.625 256 16 121.376 150.625 144.004 173.252 240.001 77.254 240.001 495.236 272.001 495.236 272.001 77.257 367.996 173.252 390.624 150.625"
+    ></polygon>
+  </svg>
+</ng-template>
+
+<ng-template #sortingIconDescendingTemplate>
+  <svg
+    class="icon icon-custom-size"
+    role="img"
+    viewBox="0 0 512 512"
+    width="18"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <polygon
+      class="ci-primary"
+      fill="var(--ci-primary-color, currentColor)"
+      points="367.997 338.75 271.999 434.747 271.999 17.503 239.999 17.503 239.999 434.745 144.003 338.75 121.376 361.377 256 496 390.624 361.377 367.997 338.75"
+    ></polygon>
+  </svg>
+</ng-template>

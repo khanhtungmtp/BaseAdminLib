@@ -1,0 +1,21 @@
+:host {
+
+  display: block;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+
+  &.active {
+    border-radius: var(--cui-form-multi-select-option-indicator-border-radius, 0.375rem);
+    box-shadow: 0 0 0.125rem 0 var(--cui-gray-400);
+  }
+
+  &.focused, :focus-visible {
+    box-shadow: 0 0 0 0.125rem rgba(50, 31, 219, 0.25);
+    outline: none;
+  }
+}
+
+:host-context(.dark-theme) {
+  --cui-form-multi-select-option-indicator-bg: var(--cui-bg-secondary);
+}

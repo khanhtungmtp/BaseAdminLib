@@ -1,0 +1,66 @@
+<table>
+  <thead *ngIf="view === 'days'">
+  <tr>
+    <th *ngFor="let weekDay of weekDays; index as i; count as cnt" class="calendar-cell">
+      <div class="calendar-header-cell-inner">
+        {{ weekDay.date | calendarWeekday:weekdayFormat:locale }}
+      </div>
+    </th>
+  </tr>
+  </thead>
+  <tbody (mouseleave)="handleCellMouseLeave()" [ngSwitch]="view">
+  <ng-container *ngSwitchCase="'years'">
+    <tr *ngFor="let yearsRow of listOfYears; index as rowIdx">
+      <td
+        (click)="handleYearCellClick(year)"
+        (keyup)="handleYearCellKeyUp($event, year)"
+        *ngFor="let year of yearsRow; index as idx"
+        [ngClass]="year | calendarClassYear"
+        [tabindex]="0"
+      >
+        <div class="calendar-cell-inner">
+          {{ yearNumber(year) }}
+        </div>
+      </td>
+    </tr>
+  </ng-container>
+  <ng-container *ngSwitchCase="'months'">
+    <tr *ngFor="let monthsRow of listOfMonths; index as rowIdx">
+      <td
+        (click)="handleMonthCellClick(rowIdx, idx)"
+        (keyup)="handleMonthCellKeyUp($event, rowIdx, idx)"
+        *ngFor="let month of monthsRow; index as idx"
+        [ngClass]="calendarDate | calendarClassMonth:(rowIdx*3+idx)"
+        [tabindex]="0"
+      >
+        <div class="calendar-cell-inner">
+          {{ month }}
+        </div>
+      </td>
+    </tr>
+  </ng-container>
+  <ng-container *ngSwitchDefault>
+    <tr *ngFor="let week of monthDetails; index as i">
+      <ng-container *ngFor="let dateObj of week; index as idx">
+        <td *ngIf="(dateObj.month === 'current' || showAdjacentDays); else emptyCell"
+            (click)="(dateObj.month === 'current' || selectAdjacentDays) && handleDayCellClick(dateObj.date)"
+            (keyup)="(dateObj.month === 'current' || selectAdjacentDays) && handleDayCellKeyUp($event, dateObj.date)"
+            (mouseenter)="(dateObj.month === 'current' || selectAdjacentDays) && handleCellMouseEnter(dateObj.date)"
+            [cCalendarDay]="dateObj"
+            [ngClass]="dateObj | calendarClassDay:{minDate, maxDate, disabledDates, dateFilter}"
+            [tabindex]="(dateObj.month === 'current' || selectAdjacentDays) && !isDateDisabled(dateObj.date) ? 0 : -1"
+            [title]="dateObj.date | calendarDayTitle:locale"
+        >
+          <div class="calendar-cell-inner">
+            {{ dateObj.date | calendarDay:dayFormat:locale }}
+          </div>
+        </td>
+        <ng-template #emptyCell>
+          <td class="calendar-cell"></td>
+        </ng-template>
+      </ng-container>
+    </tr>
+  </ng-container>
+  </tbody>
+</table>
+

@@ -1,0 +1,61 @@
+<ul [ngClass]="paginationClass">
+  <li *ngIf="doubleArrows" cPageItem>
+    <button
+      (click)="setPage(1)"
+      [disabled]="activePage === 1"
+      aria-label="First page"
+      cPageLink
+    >
+      <span aria-hidden="true">{{firstButton}}</span>
+    </button>
+  </li>
+  <li *ngIf="arrows" cPageItem>
+    <button
+      (click)="setPage(activePage - 1)"
+      [disabled]="activePage === 1"
+      aria-label="Previous page"
+      cPageLink
+    >
+      <span aria-hidden="true">{{previousButton}}</span>
+    </button>
+  </li>
+  <li *ngIf="beforeDots" cPageItem>
+    <a cPageLink disabled role="separator">
+      ...
+    </a>
+  </li>
+  <li *ngFor="let item of items; index as i" [active]="activePage === item" cPageItem>
+    <button
+      (click)="setPage(item)"
+      [title]="(activePage === item ? 'Current page ' : 'Go to page ') + (item).toString()"
+      cPageLink
+    >
+      {{item}}
+    </button>
+  </li>
+  <li *ngIf="afterDots" cPageItem>
+    <a cPageLink disabled role="separator">
+      ...
+    </a>
+  </li>
+  <li *ngIf="arrows" cPageItem>
+    <button
+      (click)="setPage(activePage + 1)"
+      [disabled]="activePage === pages"
+      aria-label="Next page"
+      cPageLink
+    >
+      <span aria-hidden="true">{{nextButton}}</span>
+    </button>
+  </li>
+  <li *ngIf="doubleArrows" cPageItem>
+    <button
+      (click)="setPage(pages)"
+      [disabled]="activePage === pages"
+      aria-label="Last page"
+      cPageLink
+    >
+      <span aria-hidden="true">{{lastButton}}</span>
+    </button>
+  </li>
+</ul>

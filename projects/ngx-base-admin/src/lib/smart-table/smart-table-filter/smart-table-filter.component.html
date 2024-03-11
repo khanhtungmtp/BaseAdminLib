@@ -1,0 +1,13 @@
+<label *ngIf="!!filterLabel" [ngClass]="labelClasses" cLabel="col" class="col-auto">
+  {{ filterLabel }}
+</label>
+<div class="col-auto">
+  <input
+    [placeholder]="filterPlaceholder"
+    [sizing]="sizing"
+    [value]="value$ | async"
+    autocomplete="off"
+    cFormControl
+    size="10"
+  />
+</div>

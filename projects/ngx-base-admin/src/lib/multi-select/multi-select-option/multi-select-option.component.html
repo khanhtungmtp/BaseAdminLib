@@ -1,0 +1,8 @@
+<div #contentDiv>
+  <ng-content></ng-content>
+</div>
+@if (!hasContent()) {
+  <div>
+    {{ text ?? label ?? value?.toString() }}
+  </div>
+}
